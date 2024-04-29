@@ -59,7 +59,7 @@ func (pq *PriorityQueue) update(item *Item, value NodeTree, priority int) {
 
 // This example creates a PriorityQueue with some items, adds and manipulates an item,
 // and then removes the items in priority order.
-func makeCodeTree(freq map[string]int) (*NodeTree, error) {
+func MakeCodeTree(freq map[string]int) (*NodeTree, error) {
 	pq := make(PriorityQueue, len(freq))
 	{
 		i := 0
@@ -94,4 +94,10 @@ func makeCodeTree(freq map[string]int) (*NodeTree, error) {
 		pq.update(new_item, new_item.value, new_item.priority)
 	}
 	return &pq.Pop().(*Item).value, nil
+}
+func gethufCode(ptr_tree NodeTree, key string, val int, code string) (string, error) {
+	for ptr_tree.content != key {
+
+	}
+	return "", nil
 }

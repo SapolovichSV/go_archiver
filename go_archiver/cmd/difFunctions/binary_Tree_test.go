@@ -10,7 +10,7 @@ func TestMakeCodeTree(t *testing.T) {
 	for _, v := range "ABRACADABRA" {
 		frequincies[string(v)]++
 	}
-	codeTree, err := makeCodeTree(frequincies)
+	codeTree, err := MakeCodeTree(frequincies)
 	if err != nil {
 		log.Fatalf("%v,#%v,%v", codeTree, codeTree, err)
 	}
