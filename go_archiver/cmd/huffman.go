@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	cmddiffunctions_tree "archiver/cmd/difFunctions"
 	"errors"
 	"fmt"
 	"io"
@@ -54,27 +55,34 @@ func init() {
 	packCmd.AddCommand(huffmanCmd)
 }
 func compressTxt(data []byte) string {
-	//minil_codes := makeMinimalCodes(string(data)) //TODO:DELETE THIS SHIT
-	//compressed_data = compressFile()      //TODO:WRITE
-	return string(data) //TODO:
+	minil_codes := makeMinimalCodes(string(data))              //TODO:DELETE THIS SHIT
+	compressed_data := compressFile(minil_codes, string(data)) //TODO:WRITE
+	return compressed_data                                     //TODO:
 }
 func makeMinimalCodes(data string) map[string]string {
 	map_counts := make(map[string]int)
 	for _, v := range data {
 		map_counts[string(v)]++
 	}
-
-	result := make(map[string]string)
+	binary_tree, err := cmddiffunctions_tree.MakeCodeTree(map_counts)
+	if err != nil {
+		handleError(err)
+	}
+	result := make(map[string]string, len(map_counts))
+	for key := range map_counts {
+		_, result[key] = cmddiffunctions_tree.GethufCode(binary_tree, key, "")
+		if err != nil {
+			handleError(err)
+		}
+	}
 	return result
 }
-
-type TreeForCodes struct {
-	left, right *TreeForCodes
-	val         node
-} //TODO:DODELAT
-type node struct {
-	key  string
-	code string
+func compressFile(codes map[string]string, data string) string {
+	compressed_data := ""
+	for _, v := range data {
+		compressed_data += codes[string(v)]
+	}
+	return compressed_data
 }
 
 //func (tree *TreeForCodes) append() //TODO:DODELAT

@@ -57,8 +57,6 @@ func (pq *PriorityQueue) update(item *Item, value NodeTree, priority int) {
 	heap.Fix(pq, item.index)
 }
 
-// This example creates a PriorityQueue with some items, adds and manipulates an item,
-// and then removes the items in priority order.
 func MakeCodeTree(freq map[string]int) (*NodeTree, error) {
 	pq := make(PriorityQueue, len(freq))
 	{
@@ -95,9 +93,24 @@ func MakeCodeTree(freq map[string]int) (*NodeTree, error) {
 	}
 	return &pq.Pop().(*Item).value, nil
 }
-func gethufCode(ptr_tree NodeTree, key string, val int, code string) (string, error) {
-	for ptr_tree.content != key {
-
+func GethufCode(root *NodeTree, target string, path string) (*NodeTree, string) {
+	if root == nil {
+		return nil, path
 	}
-	return "", nil
+
+	if root.content == target {
+		return root, path
+	}
+
+	leftNode, leftPath := GethufCode(root.left, target, path+"0")
+	if leftNode != nil {
+		return leftNode, leftPath
+	}
+
+	rightNode, rightPath := GethufCode(root.right, target, path+"1")
+	if rightNode != nil {
+		return rightNode, rightPath
+	}
+
+	return nil, path
 }
