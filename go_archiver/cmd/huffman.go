@@ -2,6 +2,7 @@ package cmd
 
 import (
 	cmddiffunctions_tree "archiver/cmd/difFunctions"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -35,11 +36,13 @@ func pack(_ *cobra.Command, args []string) {
 		handleError(err) //TODO:REFACTOR
 	}
 	//data -> Encode(data)
-	packed := compressTxt(data) // TODO:WRITE ENCODE FUNCTION
+	packed, dict := compressTxt(data) // TODO:WRITE ENCODE FUNCTION
 	//packedFileName = func()
 	if err := os.WriteFile(packedFileName(filePath), []byte(packed), 0644); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
+	json_dict, _ := json.Marshal(dict)
+	os.WriteFile("codes.txt", json_dict, 0644)
 
 }
 func handleError(err error) {
@@ -54,10 +57,10 @@ func packedFileName(path string) string {
 func init() {
 	packCmd.AddCommand(huffmanCmd)
 }
-func compressTxt(data []byte) string {
+func compressTxt(data []byte) ([]byte, map[string]string) {
 	minil_codes := makeMinimalCodes(string(data))              //TODO:DELETE THIS SHIT
 	compressed_data := compressFile(minil_codes, string(data)) //TODO:WRITE
-	return compressed_data                                     //TODO:
+	return compressed_data, minil_codes                        //TODO:
 }
 func makeMinimalCodes(data string) map[string]string {
 	map_counts := make(map[string]int)
@@ -77,12 +80,37 @@ func makeMinimalCodes(data string) map[string]string {
 	}
 	return result
 }
-func compressFile(codes map[string]string, data string) string {
-	compressed_data := ""
+func compressFile(codes map[string]string, data string) []byte {
+	bin_data := dataToBinary(codes, data)
+	return binaryDataToByteSlices(bin_data)
+}
+func dataToBinary(codes map[string]string, data string) string {
+	string_data_bin := ""
 	for _, v := range data {
-		compressed_data += codes[string(v)]
+		string_data_bin += codes[string(v)]
 	}
-	return compressed_data
+	return string_data_bin
+}
+func binaryDataToByteSlices(binaryData string) []byte {
+	index := 0
+	ByteSlice := make([]byte, 0)
+	var new_byte byte = 0
+	for _, v := range binaryData {
+		if v == '1' {
+			new_byte |= 1
+			new_byte <<= 1
+
+		} else {
+			new_byte <<= 1
+		}
+		index++
+		if index == 8 {
+			index = 0
+			ByteSlice = append(ByteSlice, new_byte)
+			new_byte = 0
+		}
+	}
+	return ByteSlice
 }
 
 //func (tree *TreeForCodes) append() //TODO:DODELAT
